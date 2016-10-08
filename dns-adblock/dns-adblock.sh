@@ -84,7 +84,7 @@ function check_list () {
 }
 
 function compare_lists () {
-	if [ -s $TMPFILE1 ] && [ -s $TMPFILE2 ]; then
+	if [ -s $TMPFILE2 ] && [ -s $TARGETFILE ]; then
 		# Unterschieden sich die neue Datei und die bestehende Datei
 		diff $TMPFILE2 $TARGETFILE
 		# Wenn ja, dann ...
