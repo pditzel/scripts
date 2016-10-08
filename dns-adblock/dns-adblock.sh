@@ -37,6 +37,8 @@ OLDTARGETFILE="${TARGETFILE}.1"
 CHECKMSG=""
 
 DIFFS=""
+
+DIFFSTAT=false
 ################################################################################
 #									       #
 # Funktionen des Programmes						       #
@@ -89,6 +91,8 @@ function compare_lists () {
 		diff $TMPFILE2 $TARGETFILE
 		# Wenn ja, dann ...
 		if [ "$?" -ne 0 ]; then
+			# STATUS der Überprüfung in eine Variable schreiben
+			DIFFSTAT=true
 			# Änderungen in eine Variable schreiben und ...
 			DIFFS="diff newBlacklsit existingBlacklist: "
 			DIFFS="$DIFFS `diff $TMPFILE2 $TARGETFILE`"
@@ -109,18 +113,22 @@ function compare_lists () {
 
 function renew_list () {
 	# Bestehende Datei wegsichern, wenn vorhanden
-	if [ -e $TARGETFILE ]; then
+	if [ -e $TARGETFILE ] && [ "$DIFFSTAT" == true ]; then
 		cp $TARGETFILE $OLDTARGETFILE
 	fi
 	# Datei aktualisieren
 	if [ -s $TMPFILE2 ]; then  
-        	mv $TMPFILE2 $TARGETFILE
+		if [ "$DIFFSTAT" == true ]; then
+        		mv $TMPFILE2 $TARGETFILE
+		fi
 	else
 		echo "Die Datei mit den Quelldaten ( $TEMPFILE2 ) ist entweder nicht vorhanden oder leer." | mailx \-r "$SENDER" \-s "Datei nicht gefunden" "$RCPT"
 		exit 1
 	fi
 	# neue Liste in bind laden
-	rndc reload
+	if [ "$DIFFSTAT" == true ]; then
+		rndc reload
+	fi
 	# Aufräumen
 	rm -f $TMPFILE1 $TMPFILE2
 }
@@ -144,4 +152,5 @@ check_list
 compare_lists
 check_root
 renew_list
+
 
