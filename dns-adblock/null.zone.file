@@ -1,0 +1,12 @@
+$TTL       604800
+@          IN         SOA        ns.yourdomain.com. hostmaster.yourdomain.com. (
+                                 1         ; Serial
+                                 604800    ; Refresh
+                                 86400     ; Retry
+                                 2419200   ; Expire
+                                 604800 )  ; Negative Cache TTL
+                                 NS        your.name.server.tld
+                                 A         your.web.server.tld
+@          IN         A          webserverip
+*          IN         A          webserverip
+
