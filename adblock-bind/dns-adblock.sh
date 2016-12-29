@@ -13,14 +13,14 @@
 #									       #
 ################################################################################
 #
-# Wie soll die AdServer-Liste heißen und wo abgespiechert werden
+# Wie soll die AdServer-Liste heissen und wo abgespiechert werden
 TARGETFILE=/etc/bind/blacklist
 
 # Absendeadresse für E-Mails
-SENDER=netzmeister@central-computer.de
+SENDER=sender@domain.tld
 
 # Empfaengeradresse für E-Mails
-RCPT=patrick@central-computer.de
+RCPT=rcpt@domain.tld
 
 ################################################################################
 #									       #
