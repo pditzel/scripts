@@ -67,16 +67,16 @@ function check_list () {
 	if [ -s $TMPFILE2 ]; then
 		while read LINE; do
 			# Zeilenweise nach Einträgen suchen, die nicht den Namen der Zonendatei enthalten
-			echo $LINE | grep -v "null.zone.file"
+			echo "$LINE" | grep -v "null.zone.file"
 			# Wird ein solcher Eintrag gefunden, wird dieser in die Variable $CHEKCMSG geschrieben
 			if [ "$?" -eq 0 ]; then
 				CHECKMSG="$CHECKMSG Entry found not targeting to null.zone.file:\n $LINE \n --- --- ---\n" 
 			fi
 		done < $TMPFILE2	
 		# Wenn die Variable $CHECKMSG nicht leer ist, ... 
-		if [ -n "$CHECKMEG" ]; then
+		if [ -n "$CHECKMSG" ]; then
 			# ... via E-Mail über das Ergebnis informiert.
-			echo $CHECKMSG | mailx \-r "$SENDER" \-s "Nicht konforme Einträge in der AdBlock DNS-Liste gefunden" "$RCPT"
+			echo "$CHECKMSG" | mailx \-r "$SENDER" \-s "Nicht konforme Einträge in der AdBlock DNS-Liste gefunden" "$RCPT"
 			exit 1
 		fi
 	else
@@ -95,10 +95,10 @@ function compare_lists () {
 			DIFFSTAT=true
 			# Änderungen in eine Variable schreiben und ...
 			DIFFS="diff newBlacklsit existingBlacklist: "
-			DIFFS="$DIFFS `diff $TMPFILE2 $TARGETFILE`"
+			DIFFS="$DIFFS $(diff $TMPFILE2 $TARGETFILE)"
 			DIFFS="$DIFFS --- --- --- "
 			# ... per E-Mail versenden
-			echo $DIFFS | mailx \-r "$SENDER" \-s "Aenderungen an der DNS Blackliste" "$RCPT"	
+			echo "$DIFFS" | mailx \-r "$SENDER" \-s "Aenderungen an der DNS Blackliste" "$RCPT"	
 		fi
 	else
 		if [ ! -s $TMPFILE1 ]; then
@@ -122,7 +122,7 @@ function renew_list () {
         		mv $TMPFILE2 $TARGETFILE
 		fi
 	else
-		echo "Die Datei mit den Quelldaten ( $TEMPFILE2 ) ist entweder nicht vorhanden oder leer." | mailx \-r "$SENDER" \-s "Datei nicht gefunden" "$RCPT"
+		echo "Die Datei mit den Quelldaten ( $TMPFILE2 ) ist entweder nicht vorhanden oder leer." | mailx \-r "$SENDER" \-s "Datei nicht gefunden" "$RCPT"
 		exit 1
 	fi
 	# neue Liste in bind laden
