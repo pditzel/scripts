@@ -1,6 +1,6 @@
 # Databasebackup (dbbackup)
 
-This is a bash-script to backup your databases with tho most common standard tools.
+This is a bash-script to backup your databases with the most common standard tools.
 
 ## Requirenments
 
