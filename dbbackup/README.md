@@ -18,3 +18,6 @@ This script aims to backup many different databasetype eg. postgres, mysql or mo
 * Optinal keep a filehistory of backups
 * Optinal logging to syslog
 * Reads configuration for postgresbackups from ~/.pgpass
+
+More Information here: [https://www.central-computer.de/datenbanken-backup/]
+
