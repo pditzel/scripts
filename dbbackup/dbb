@@ -113,13 +113,13 @@ function is_interactive {
 
 function backup_file_handler {
 	# translate the vars to make it more readable
-	TMPDIR=$1
-	BACKUPDIR=$2
-	FILE=$3
+	BFH_TMP_DIR=$1
+	BFH_BACKUPDIR_DIR=$2
+	BFH_FILE=$3
 	# If enabled put out some debug infos
-	debug "TMPDIR: $TMPDIR"
-	debug "BACKUPDIR: $BACKUPDIR"
-	debug "FILE: $FILE"
+	debug "BFH_TMP_DIR: $BFH_TMP_DIR"
+	debug "BFH_BACKUPDIR_DIR: $BFH_BACKUPDIR_DIR"
+	debug "FILE: $BFH_FILE"
 	# Check if the script should keep a filehistorie
 	if [ "$KEEP_BACKUP_FILES" = "TRUE" ]; then
 		debug "Keep history"
@@ -130,48 +130,48 @@ function backup_file_handler {
 		# ... and if it is turned on give some debig info
 		debug "BACKUP_DAY: $BACKUP_DAY"
 		debug "REMOVE_NUMBER: $REMOVE_NUMBER"
-		debug "FILE_PREFIX_NAME_TO_REMOVE: $FILE_PREFIX_NAME_TO_REMOVE-$FILE"
+		debug "FILE_PREFIX_NAME_TO_REMOVE: $BFH_FILE_PREFIX_NAME_TO_REMOVE-$BFH_FILE"
 		# Check there is an backupfile from the current day
-		if [ -f $BACKUPDIR/$BACKUP_DAY-$FILE ]; then
+		if [ -f $BFH_BACKUPDIR_DIR/$BACKUP_DAY-$BFH_FILE ]; then
 			# If yes append miniutes and seconds to the date-profix of the filename
-			debug "File $BACKUPDIR/$BACKUP_DAY-$FILE already exists. Rename the new one."
+			debug "File $BFH_BACKUPDIR_DIR/$BACKUP_DAY-$BFH_FILE already exists. Rename the new one."
 			DATE_TIME_SUFFIX=$(date +%H%M%S)
 			# ... and move it into the targetdir
-			mv $TMPDIR/$FILE $BACKUPDIR/$BACKUP_DAY-$DATE_TIME_SUFFIX-$FILE
+			mv $BFH_TMP_DIR/$BFH_FILE $BFH_BACKUPDIR_DIR/$BACKUP_DAY-$DATE_TIME_SUFFIX-$BFH_FILE
 		else
 			# If there is no backupfile of the current day move it to the backupfolder
-			mv $TMPDIR/$FILE $BACKUPDIR/$BACKUP_DAY-$FILE
+			mv $BFH_TMP_DIR/$BFH_FILE $BFH_BACKUPDIR_DIR/$BACKUP_DAY-$BFH_FILE
 		fi
 		# Check if there are files oder then the days to keep set in the config
-		if [ -f $BACKUPDIR/$FILE_PREFIX_NAME_TO_REMOVE-$FILE ]; then
+		if [ -f $BFH_BACKUPDIR_DIR/$BFH_FILE_PREFIX_NAME_TO_REMOVE-$BFH_FILE ]; then
 			# if yes remove it
-			rm $BACKUPDIR/$FILE_PREFIX_NAME_TO_REMOVE-$FILE
+			rm $BFH_BACKUPDIR_DIR/$BFH_FILE_PREFIX_NAME_TO_REMOVE-$BFH_FILE
 			# Also remove the files with the extended prefix in the name
 			# If there is ab file with the extende prefix then there has to be a file with tne normal prefix
-			rm $BACKUPDIR/$FILE_PREFIX_NAME_TO_REMOVE?????-$FILE
+			rm $BFH_BACKUPDIR_DIR/$BFH_FILE_PREFIX_NAME_TO_REMOVE?????-$BFH_FILE
 		else
 			# If no file exists do nothing but some debuginfo
-			debug "File $BACKUPDIR/$FILE_PREFIX_NAME_TO_REMOVE-$FILE does not exists, so can not remove it."
+			debug "File $BFH_BACKUPDIR_DIR/$BFH_FILE_PREFIX_NAME_TO_REMOVE-$BFH_FILE does not exists, so can not remove it."
 		fi
 	else
 		# If we do not keep a filehistory do thw following
 		# Check if the targefile exists
-		if [ -f $BACKUPDIR/$FILE ]; then
-			debug "$FILE exists ... make a diff"
+		if [ -f $BFH_BACKUPDIR_DIR/$BFH_FILE ]; then
+			debug "$BFH_FILE exists ... make a diff"
 			# Check if there are differences betwenn last backup and the actual one
-			diff $TMPDIR/$FILE $BACKUPDIR/$FILE > /dev/null 2>&1
+			diff $BFH_TMP_DIR/$BFH_FILE $BFH_BACKUPDIR_DIR/$BFH_FILE > /dev/null 2>&1
 			if [ $? -ne 0 ]; then
 				# If yes then move it to the backupfolder
-				debug "Differences found between old and new $FILE -> moving to BACKUP_DIR"
-				mv $TMPDIR/$FILE $BACKUPDIR/$FILE
+				debug "Differences found between old and new $BFH_FILE -> moving to BACKUP_DIR"
+				mv $BFH_TMP_DIR/$BFH_FILE $BFH_BACKUPDIR_DIR/$BFH_FILE
 			else
 				# If not do nothing
-				debug "No differences found between old an new $FILE"
+				debug "No differences found between old an new $BFH_FILE"
 			fi
 		else
 			# If there is a new databasedumpfile move it to the backupfolder
-			debug "New Backupfile $FILE -> moving to $BACKUPDIR"
-			mv $TMPDIR/$FILE $BACKUPDIR/$FILE
+			debug "New Backupfile $BFH_FILE -> moving to $BFH_BACKUPDIR_DIR"
+			mv $BFH_TMP_DIR/$BFH_FILE $BFH_BACKUPDIR_DIR/$BFH_FILE
 		fi
 	fi
 }
