@@ -52,6 +52,18 @@ function check_backup_env {
 		# If not create it
 		mkdir -p $TMP_DIR
 	fi
+	# Check the dependencys
+	if [ ! -e /usr/bin/sudo ]; then
+		echo "It seems that you dont have sudo installed. Please install sudo and restart" | /usr/bin/logger -s -i -t databasebackup
+		exit 1
+	fi
+	if [ ! -e /usr/bin/psql ]; then
+		echo "It seems that you dont have psql installed. You may have problems to backup remote databases" | /usr/bin/logger -s -i -t databasebackup
+	fi
+	numberRegex='^[0-9]+$'
+	if ! [[ $(id -u postgres 2>&1) =~ $numberRegex ]] ; then
+		echo "It seems that you dont have the user postgres on your computer. You may have problems to backup local postgres databases" | /usr/bin/logger -s -i -t databasebackup
+	fi
 }
 
 function set_logger {
