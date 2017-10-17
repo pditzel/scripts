@@ -43,14 +43,14 @@ function check_backup_env {
 		echo "################################################################################" | /usr/bin/logger -s -i -t databasebackup
 	fi
 	# Check if the target directory for the backupfiles exists
-	if [ ! -d $BACKUP_DIR ]; then
+	if [ ! -d "$BACKUP_DIR" ]; then
 		# If not create it
-		mkdir -p $BACKUP_DIR
+		mkdir -p "$BACKUP_DIR"
 	fi
 	# Check if the directory for tempfiles exists
-	if [ ! -d $TMP_DIR ]; then
+	if [ ! -d "$TMP_DIR" ]; then
 		# If not create it
-		mkdir -p $TMP_DIR
+		mkdir -p "$TMP_DIR"
 	fi
 	# Check the dependencys
 	if [ ! -e /usr/bin/sudo ]; then
@@ -80,13 +80,13 @@ function set_logger {
 function debug {
         DEBUGMSG=$1
         if [ "$ENABLE_DEBUG" = "TRUE" ]; then
-                echo $DEBUGMSG | $LOGGER
+                echo "$DEBUGMSG" | $LOGGER
         fi
 }
 
 function is_interactive {
-	SCRPT=$(basename $0)
-	debug $SCRPT
+	SCRPT=$(basename "$0")
+	debug "$SCRPT"
 
 	if [ "$SCRPT" = "dbbi" ]; then
 		# If the script is called for interactive use we have to chenge the calls of the functions
@@ -126,29 +126,29 @@ function backup_file_handler {
 		# Set some vars to manage the files
 		BACKUP_DAY=$(date +%x)
 		REMOVE_NUMBER=$(( $BACKUP_FILES_DAYS + 1 ))
-		FILE_PREFIX_NAME_TO_REMOVE=$(date -d "$REMOVE_NUMBER days ago" "+%x")
+		BFH_FILE_PREFIX_NAME_TO_REMOVE=$(date -d "$REMOVE_NUMBER days ago" "+%x")
 		# ... and if it is turned on give some debig info
 		debug "BACKUP_DAY: $BACKUP_DAY"
 		debug "REMOVE_NUMBER: $REMOVE_NUMBER"
 		debug "FILE_PREFIX_NAME_TO_REMOVE: $BFH_FILE_PREFIX_NAME_TO_REMOVE-$BFH_FILE"
 		# Check there is an backupfile from the current day
-		if [ -f $BFH_BACKUPDIR_DIR/$BACKUP_DAY-$BFH_FILE ]; then
+		if [ -f "$BFH_BACKUPDIR_DIR"/"$BACKUP_DAY"-"$BFH_FILE" ]; then
 			# If yes append miniutes and seconds to the date-profix of the filename
 			debug "File $BFH_BACKUPDIR_DIR/$BACKUP_DAY-$BFH_FILE already exists. Rename the new one."
 			DATE_TIME_SUFFIX=$(date +%H%M%S)
 			# ... and move it into the targetdir
-			mv $BFH_TMP_DIR/$BFH_FILE $BFH_BACKUPDIR_DIR/$BACKUP_DAY-$DATE_TIME_SUFFIX-$BFH_FILE
+			mv "$BFH_TMP_DIR"/"$BFH_FILE" "$BFH_BACKUPDIR_DIR"/"$BACKUP_DAY"-"$DATE_TIME_SUFFIX"-"$BFH_FILE"
 		else
 			# If there is no backupfile of the current day move it to the backupfolder
-			mv $BFH_TMP_DIR/$BFH_FILE $BFH_BACKUPDIR_DIR/$BACKUP_DAY-$BFH_FILE
+			mv "$BFH_TMP_DIR"/"$BFH_FILE" "$BFH_BACKUPDIR_DIR"/"$BACKUP_DAY"-"$BFH_FILE"
 		fi
 		# Check if there are files oder then the days to keep set in the config
-		if [ -f $BFH_BACKUPDIR_DIR/$BFH_FILE_PREFIX_NAME_TO_REMOVE-$BFH_FILE ]; then
+		if [ -f "$BFH_BACKUPDIR_DIR"/"$BFH_FILE_PREFIX_NAME_TO_REMOVE"-"$BFH_FILE" ]; then
 			# if yes remove it
-			rm $BFH_BACKUPDIR_DIR/$BFH_FILE_PREFIX_NAME_TO_REMOVE-$BFH_FILE
+			rm "$BFH_BACKUPDIR_DIR"/"$BFH_FILE_PREFIX_NAME_TO_REMOVE"-"$BFH_FILE"
 			# Also remove the files with the extended prefix in the name
 			# If there is ab file with the extende prefix then there has to be a file with tne normal prefix
-			rm $BFH_BACKUPDIR_DIR/$BFH_FILE_PREFIX_NAME_TO_REMOVE?????-$BFH_FILE
+			rm "$BFH_BACKUPDIR_DIR"/"$BFH_FILE_PREFIX_NAME_TO_REMOVE"?????-"$BFH_FILE"
 		else
 			# If no file exists do nothing but some debuginfo
 			debug "File $BFH_BACKUPDIR_DIR/$BFH_FILE_PREFIX_NAME_TO_REMOVE-$BFH_FILE does not exists, so can not remove it."
@@ -156,14 +156,14 @@ function backup_file_handler {
 	else
 		# If we do not keep a filehistory do thw following
 		# Check if the targefile exists
-		if [ -f $BFH_BACKUPDIR_DIR/$BFH_FILE ]; then
+		if [ -f "$BFH_BACKUPDIR_DIR"/"$BFH_FILE" ]; then
 			debug "$BFH_FILE exists ... make a diff"
 			# Check if there are differences betwenn last backup and the actual one
-			diff $BFH_TMP_DIR/$BFH_FILE $BFH_BACKUPDIR_DIR/$BFH_FILE > /dev/null 2>&1
+			diff "$BFH_TMP_DIR"/"$BFH_FILE" "$BFH_BACKUPDIR_DIR"/"$BFH_FILE" > /dev/null 2>&1
 			if [ $? -ne 0 ]; then
 				# If yes then move it to the backupfolder
 				debug "Differences found between old and new $BFH_FILE -> moving to BACKUP_DIR"
-				mv $BFH_TMP_DIR/$BFH_FILE $BFH_BACKUPDIR_DIR/$BFH_FILE
+				mv "$BFH_TMP_DIR"/"$BFH_FILE" "$BFH_BACKUPDIR_DIR"/"$BFH_FILE"
 			else
 				# If not do nothing
 				debug "No differences found between old an new $BFH_FILE"
@@ -171,7 +171,7 @@ function backup_file_handler {
 		else
 			# If there is a new databasedumpfile move it to the backupfolder
 			debug "New Backupfile $BFH_FILE -> moving to $BFH_BACKUPDIR_DIR"
-			mv $BFH_TMP_DIR/$BFH_FILE $BFH_BACKUPDIR_DIR/$BFH_FILE
+			mv "$BFH_TMP_DIR"/"$BFH_FILE" "$BFH_BACKUPDIR_DIR"/"$BFH_FILE"
 		fi
 	fi
 }
@@ -186,10 +186,10 @@ function pg_local_all {
 	# Debugoutput id DEBUG is enabled
 	debug "Dump all from Postgres local"
 	# Dump all databases in one file as user postgres (Debian)
-	sudo -H -i -u postgres pg_dumpall > $TMP_DIR/local_dumpall.pgsql
+	sudo -H -i -u postgres pg_dumpall > "$TMP_DIR"/local_dumpall.pgsql
 	debug "Diff alldumps from Postgres local" 
 	# Check if there are differences between the actual dump and the last dump
-	backup_file_handler $TMP_DIR $BACKUP_DIR local_dumpall.pgsql
+	backup_file_handler "$TMP_DIR $BACKUP_DIR" local_dumpall.pgsql
 }
 
 function pg_local_single {
@@ -199,8 +199,8 @@ function pg_local_single {
 		do
 			debug "Dumping local database $DB"
 			# Dump each database in a single file
-			sudo -H -i -u postgres /usr/bin/pg_dump -Fp $DB > $TMP_DIR/local_$DB.pgsql
-			backup_file_handler $TMP_DIR $BACKUP_DIR local_$DB.pgsql
+			sudo -H -i -u postgres /usr/bin/pg_dump -Fp "$DB" > "$TMP_DIR"/local_"$DB".pgsql
+			backup_file_handler "$TMP_DIR" "$BACKUP_DIR" local_"$DB".pgsql
 			echo ""
 		done
 }
@@ -210,7 +210,7 @@ function pg_local_single {
 function run_local_pg_backups {
 	# Test if the current backupuser has access via sudo to postgres
 	# This part has to be improved!
-	sudo -l -U $BACKUPUSER | grep postgres
+	sudo -l -U "$BACKUPUSER" | grep postgres
 	if [ $? -eq 0 ];then
 		# If the user has access vi sudo to postgres and a full dump is configured, do it.
 		if [ "$POSTGRES_BACKUP_LOCAL_DUMP_ALL" == "TRUE" ]; then
@@ -251,15 +251,15 @@ function dump_remote_pgdb {
 	debug "    User: $TRGTBDUSER"
 	debug "Testing TLS-Connection"
 	# Check if the connection to the postgres-server are encryptet (here we force with sslmode=require)
-	psql -U $TRGTBDUSER postgresql://$TRGTHOST:$TRGTPORT/$TRGTDB?sslmode=require -c '\conninfo' | grep TLS > /dev/null 2>&1
+	psql -U "$TRGTBDUSER" postgresql://"$TRGTHOST":"$TRGTPORT"/"$TRGTDB"?sslmode=require -c '\conninfo' | grep TLS > /dev/null 2>&1
 	if [ "$?" -eq "0" ]; then
 		debug "Dumping remote database $TRGTHOST-$TRGTDB"
 		# If we successfuly testet the encrypted connection to the postgres-server we try to force the sslmode
 		# I don't know if the following statement really effect to pg_dump :-(
 		export PGSSLMODE=require
 		# Dump the databases which are defined in the params
-		/usr/bin/pg_dump -U $TRGTBDUSER -h $TRGTHOST -p $TRGTPORT $TRGTDB > $TMP_DIR/$TRGTHOST-$TRGTDB.pgql
-		backup_file_handler $TMP_DIR $BACKUP_DIR $TRGTHOST-$TRGTDB.pgql
+		/usr/bin/pg_dump -U "$TRGTBDUSER" -h "$TRGTHOST" -p "$TRGTPORT" "$TRGTDB" > "$TMP_DIR"/"$TRGTHOST"-"$TRGTDB".pgql
+		backup_file_handler "$TMP_DIR" "$BACKUP_DIR" "$TRGTHOST"-"$TRGTDB".pgql
 	else
 		# If no encrypted connection to the postgres-server can be established throw an errormessage
 		echo "" | $LOGGER
@@ -279,7 +279,7 @@ function run_remote_pg_backups {
 			while read -r LINE; do 
 				# For each entry do the backup
 				debug "run dump with params $LINE"
-				dump_remote_pgdb $LINE
+				dump_remote_pgdb "$LINE"
 			# To get the params for the function the .pgpass-file is striped from the comments,
 			# the ":" are replaces against whitespaces and only the first four coloums are used
 			# so we give "host port database user" to the function
@@ -313,12 +313,12 @@ function run_remote_pg_backups {
 
 function run_mysql_backups {
 	debug "Dump remote database $MYSQLDB from $MYSQLDBHOST"
-	/usr/bin/mysqldump --skip-dump-date -h $MYSQLDBHOST -u $MYSQLDBUSER -p$MYSQLPASSWD $MYSQLDB > $TMP_DIR/$MYSQLDBHOST_$MYSQLDB.mysql
+	/usr/bin/mysqldump --skip-dump-date -h "$MYSQLDBHOST" -u "$MYSQLDBUSER" -p"$MYSQLPASSWD" "$MYSQLDB" > "$TMP_DIR"/"$MYSQLDBHOST"_"$MYSQLDB".mysql
 	debug "Diff MySQLDump $MYSQLDB"
-	diff $TMP_DIR/$MYSQLDBHOST_$MYSQLDB.mysql $BACKUP_DIR/$MYSQLDBHOST_$MYSQLDB.mysql > /dev/null 2>&1
+	diff "$TMP_DIR"/"$MYSQLDBHOST"_"$MYSQLDB".mysql "$BACKUP_DIR"/"$MYSQLDBHOST"_"$MYSQLDB".mysql > /dev/null 2>&1
 	if [ $? -ne 0 ]; then
 		debug "Differences found -> moving to BACKUP_DIR"
-	        mv $TMP_DIR/$MYSQLDBHOST_$MYSQLDB.mysql $BACKUP_DIR/$MYSQLDBHOST_$MYSQLDB.mysql
+	        mv "$TMP_DIR"/"$MYSQLDBHOST"_"$MYSQLDB".mysql "$BACKUP_DIR"/"$MYSQLDBHOST"_"$MYSQLDB".mysql
 	else
 	        debug "No differences found an Database $MYSQLDB"
 	fi
@@ -377,7 +377,7 @@ function main {
 			run_remote_mongodb_backup
 		fi
 			# The final action: remove the dumps
-		rm -rf $TMP_DIR
+		rm -rf "$TMP_DIR"
 	fi
 
 }
