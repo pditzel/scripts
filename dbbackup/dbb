@@ -279,7 +279,8 @@ function run_remote_pg_backups {
 			while read -r LINE; do 
 				# For each entry do the backup
 				debug "run dump with params $LINE"
-				dump_remote_pgdb "$LINE"
+				# CAUTION: No doublequotes in the following line. The var $LINE has to be splittet!
+                                dump_remote_pgdb $LINE
 			# To get the params for the function the .pgpass-file is striped from the comments,
 			# the ":" are replaces against whitespaces and only the first four coloums are used
 			# so we give "host port database user" to the function
