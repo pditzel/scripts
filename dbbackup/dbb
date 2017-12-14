@@ -26,7 +26,7 @@ function set_config {
 function check_backup_env {
 	# Check if the configuration exists and is not empty
 	if [ -r $BACKUPCFG ] && [ -s $BACKUPCFG ]; then
-		# If true then load it
+		# If true then read it
 		. $BACKUPCFG
 	else
 		# If not throw an errormessage
@@ -131,7 +131,7 @@ function backup_file_handler {
 		debug "BACKUP_DAY: $BACKUP_DAY"
 		debug "REMOVE_NUMBER: $REMOVE_NUMBER"
 		debug "FILE_PREFIX_NAME_TO_REMOVE: $BFH_FILE_PREFIX_NAME_TO_REMOVE-$BFH_FILE"
-		# Check there is an backupfile from the current day
+		# Check if there is an backupfile from the current day
 		if [ -f "$BFH_BACKUPDIR_DIR"/"$BACKUP_DAY"-"$BFH_FILE" ]; then
 			# If yes append miniutes and seconds to the date-profix of the filename
 			debug "File $BFH_BACKUPDIR_DIR/$BACKUP_DAY-$BFH_FILE already exists. Rename the new one."
@@ -142,7 +142,7 @@ function backup_file_handler {
 			# If there is no backupfile of the current day move it to the backupfolder
 			mv "$BFH_TMP_DIR"/"$BFH_FILE" "$BFH_BACKUPDIR_DIR"/"$BACKUP_DAY"-"$BFH_FILE"
 		fi
-		# Check if there are files oder then the days to keep set in the config
+		# Check if there are files older then the days to keep set in the config
 		if [ -f "$BFH_BACKUPDIR_DIR"/"$BFH_FILE_PREFIX_NAME_TO_REMOVE"-"$BFH_FILE" ]; then
 			# if yes remove it
 			rm "$BFH_BACKUPDIR_DIR"/"$BFH_FILE_PREFIX_NAME_TO_REMOVE"-"$BFH_FILE"
@@ -154,7 +154,7 @@ function backup_file_handler {
 			debug "File $BFH_BACKUPDIR_DIR/$BFH_FILE_PREFIX_NAME_TO_REMOVE-$BFH_FILE does not exists, so can not remove it."
 		fi
 	else
-		# If we do not keep a filehistory do thw following
+		# If we do not keep a filehistory do the following
 		# Check if the targefile exists
 		if [ -f "$BFH_BACKUPDIR_DIR"/"$BFH_FILE" ]; then
 			debug "$BFH_FILE exists ... make a diff"
