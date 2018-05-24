@@ -8,7 +8,7 @@
 #									       #
 ################################################################################
 
-ENABLE_DEBUG=TRUE
+ENABLE_DEBUG=FALSE
 
 function get_info () {
 	
