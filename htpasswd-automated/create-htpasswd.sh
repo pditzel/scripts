@@ -1,19 +1,23 @@
 #!/bin/bash
 
 DEBUG=TRUE
+DEPENDENCYLIST="htpasswd pwgen"
 
 function checkDependencies () {
 	# Check for the software dependencies we need
 	# - htpasswd
+	# - pwgen
 	# - all other commands should be built in in bash or installed on your system per default.
-	if ! type "htpasswd" > /dev/null; then
-		echo "The command htpasswd is needed but not found. Pleas install it (e.g. apt install apache2-utils)."
-		exit 1
-	else
-		if [ "${DEBUG}" == TRUE ]; then
-			echo "Found htpasswd, continue..."
+	for DEP in $DEPENDENCYLIST; do
+		if ! type "$DEP" > /dev/null; then
+			echo "The command $DEP is needed but not found. Pleas install it."
+			exit 1
+		else
+			if [ "${DEBUG}" == TRUE ]; then
+				echo "Found $DEP, continue..."
+			fi
 		fi
-	fi
+	done 
 }
 
 function getInfo () {
